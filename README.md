@@ -94,12 +94,12 @@ The `run-heat-ansible` script is the main entry point.  It uses the following
 environment variables:
 * `OPENRC` - Required - the OPENRC file you created above e.g. `~/.openstackrc`
 * `START_STEP` - Required - which step to start with
-** `clean` - delete everything and start over
-** `create` - create the VM
-** `fqdn` - get the FQDN and floating IP of the machine and set up `/etc/hosts`
-** `create-inventory` - create the Ansible inventory file
-** `install-openshift` - install OpenShift using Ansible
-** `install-logging` - install OpenShift aggregated logging
+  * `clean` - delete everything and start over
+  * `create` - create the VM
+  * `fqdn` - get the FQDN and floating IP of the machine and set up `/etc/hosts`
+  * `create-inventory` - create the Ansible inventory file
+  * `install-openshift` - install OpenShift using Ansible
+  * `install-logging` - install OpenShift aggregated logging
 * `ANSIBLE_LOG_PATH` - Optional - dump a copy of the Ansible logs to this file
 
 For example:
