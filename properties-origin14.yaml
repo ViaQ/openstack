@@ -1,0 +1,17 @@
+parameters:
+  flavor: m1.large
+  key: rmeggins-pubkey
+  public_network: external
+  image: centos-7-cloud
+  run_stack_name: origin-14.rmeggins.test
+  oshift_hostname: origin-14.rmeggins.test
+  kibana_hostname: kibana-14.rmeggins.test
+  kibana_ops_hostname: kibana-14-ops.rmeggins.test
+  es_hostname: es-14.rmeggins.test
+  es_ops_hostname: es-14-ops.rmeggins.test
+  run_stack_file: heat-origin-1.x.yaml
+  variant: origin
+  variant_version: 1.4
+  openshift_version: 1.4.0
+  logging_image_version: latest
+  logging_image_prefix: docker.io/openshift/origin-
