@@ -1,0 +1,274 @@
+heat_template_version: 2014-10-16
+
+description: This template creates an OpenShift server image from a binary upstream release
+
+parameters:
+  oshift_hostname:
+    type: string
+    label: OpenShift hostname
+    description: FQDN for OpenShift node
+    default: origin-1.x.rmeggins.test
+  kibana_hostname:
+    type: string
+    label: kibana hostname
+    description: FQDN for kibana node
+    default: kibana.rmeggins.test
+  kibana_ops_hostname:
+    type: string
+    label: kibana ops hostname
+    description: FQDN for kibana ops node
+    default: kibana-ops.rmeggins.test
+  es_hostname:
+    type: string
+    label: elasticsearch hostname
+    description: FQDN for elasticsearch node
+    default: es.rmeggins.test
+  es_ops_hostname:
+    type: string
+    label: elasticsearch ops hostname
+    description: FQDN for elasticsearch ops node
+    default: es-ops.rmeggins.test
+  image:
+    type: string
+    label: Image name or ID
+    description: Image to be used for the server.
+    default: centos-7-cloud
+  flavor:
+    type: string
+    label: Flavor
+    description: Type of instance (flavor) to be used on the compute instance.
+    default: m1.large
+  key:
+    type: string
+    label: Key name
+    description: Name of key-pair to be installed on the compute instance.
+    default: rmeggins-pubkey
+  public_network:
+    type: string
+    label: Public network name or ID
+    description: Public network with floating IP addresses.
+    default: external
+  run_stack_file:
+    type: string
+    label: name of stack file containing the stack used to run the test instances
+    description: name of stack file containing the stack used to run the test instances
+    default: heat-origin-1.x.yaml
+  run_stack_name:
+    type: string
+    label: name of stack used to run the tests
+    description: name of stack used to produce the image
+    default: origin-14.rmeggins.test
+  insecure_registries:
+    type: string
+    label: additional insecure docker registry to use (e.g. for testing)
+    description: additional insecure docker registry to use (e.g. for testing)
+    default: ""
+  package_repo:
+    type: string
+    label: additional yum repo to use
+    description: additional yum repo to use
+    default: ""
+  variant:
+    type: string
+    label: openshift variant - either openshift-enterprise or origin
+    description: openshift variant - either openshift-enterprise or origin
+    default: "origin"
+  openshift_version:
+    type: string
+    label: openshift version major.minor.rev
+    description: openshift version major.minor.rev
+    default: "1.4.0"
+  variant_version:
+    type: string
+    label: ose version - major and minor
+    description: ose version - major and minor
+    default: "1.4"
+  logging_image_version:
+    type: string
+    label: logging images version
+    description: logging images version
+    default: "1.4.0"
+  logging_image_prefix:
+    type: string
+    label: logging images prefix
+    description: logging images prefix
+    default: "docker.io/openshift/origin-"
+resources:
+  oshift_boot_config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        cloud_config_modules:
+          - timezone
+          - runcmd
+          - bootcmd
+          - yum_add_repo
+          - package_update_upgrade_install
+        system_info:
+          default_user:
+            name: centos
+            plain_text_passwd: password
+            lock_passwd: False
+            sudo: ALL=(ALL) NOPASSWD:ALL
+        password: password
+        chpasswd: {expire: False}
+        ssh_pwauth: True
+        yum_repos:
+          centos-openshift-common-candidate:
+            baseurl: https://cbs.centos.org/repos/paas7-openshift-common-candidate/x86_64/os/
+            enabled: 0
+            gpgcheck: 0
+            name: CentOS OpenShift Common Candidate
+          centos-openshift-future:
+            baseurl: http://mirror.centos.org/centos/7/paas/x86_64/openshift-future/
+            enabled: 0
+            gpgcheck: 1
+            gpgkey: https://tdawson.fedorapeople.org/centos/RPM-GPG-KEY-CentOS-SIG-PaaS
+            name: CentOS OpenShift Future
+          centos-openshift-future-candidate:
+            baseurl: https://cbs.centos.org/repos/paas7-openshift-future-candidate/x86_64/os/
+            enabled: 1
+            gpgcheck: 0
+            name: CentOS OpenShift Future Candidate
+          centos-openshift-future-testing:
+            baseurl: http://buildlogs.centos.org/centos/7/paas/x86_64/openshift-future/
+            enabled: 0
+            gpgcheck: 0
+            gpgkey: https://tdawson.fedorapeople.org/centos/RPM-GPG-KEY-CentOS-SIG-PaaS
+            name: CentOS OpenShift Future Testing
+          centos-openshift-origin:
+            baseurl: http://mirror.centos.org/centos/7/paas/x86_64/openshift-origin/
+            enabled: 1
+            gpgcheck: 1
+            gpgkey: https://tdawson.fedorapeople.org/centos/RPM-GPG-KEY-CentOS-SIG-PaaS
+            name: CentOS OpenShift Origin
+          centos-openshift-origin-candidate:
+            baseurl: https://cbs.centos.org/repos/paas7-openshift-origin-candidate/x86_64/os/
+            enabled: 0
+            gpgcheck: 0
+            name: CentOS OpenShift Origin Candidate
+          centos-openshift-origin-debuginfo:
+            baseurl: http://debuginfo.centos.org/centos/7/paas/x86_64/
+            enabled: 0
+            gpgcheck: 1
+            gpgkey: https://tdawson.fedorapeople.org/centos/RPM-GPG-KEY-CentOS-SIG-PaaS
+            name: CentOS OpenShift Origin DebugInfo
+          centos-openshift-origin-source:
+            baseurl: http://vault.centos.org/centos/7/paas/Source/openshift-origin/
+            enabled: 0
+            gpgcheck: 1
+            gpgkey: https://tdawson.fedorapeople.org/centos/RPM-GPG-KEY-CentOS-SIG-PaaS
+            name: CentOS OpenShift Origin Source
+          centos-openshift-origin-testing:
+            baseurl: http://buildlogs.centos.org/centos/7/paas/x86_64/openshift-origin/
+            enabled: 0
+            gpgcheck: 0
+            gpgkey: https://tdawson.fedorapeople.org/centos/RPM-GPG-KEY-CentOS-SIG-PaaS
+            name: CentOS OpenShift Origin Testing
+        package_upgrade: true
+        packages:
+          - bc
+          - sysstat
+          - strace
+          - git
+          - wget
+          - screen
+          - docker
+          - java
+          - golang
+          - iptables-services
+          - NetworkManager
+        write_files:
+          - path: /etc/sudoers.d/999-cloud-init-requiretty
+            owner: root:root
+            permissions: '0440'
+            content: |
+              Defaults !requiretty
+        runcmd:
+          - [ hostname, { get_param: oshift_hostname } ]
+          - [ systemctl, daemon-reload ]
+          - [ systemctl, start, NetworkManager ]
+
+  oshift_server_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: oshift_server_security_group
+      rules:
+        - protocol: icmp
+        - protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        - protocol: tcp
+          port_range_min: 5901
+          port_range_max: 5901
+        - protocol: tcp
+          port_range_min: 80
+          port_range_max: 80
+        - protocol: tcp
+          port_range_min: 443
+          port_range_max: 443
+        - protocol: tcp
+          port_range_min: 8443
+          port_range_max: 8443
+        - protocol: tcp
+          port_range_min: 5601
+          port_range_max: 5601
+
+  private_network:
+    type: OS::Neutron::Net
+
+  private_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network_id: { get_resource: private_network }
+      cidr: 192.168.78.0/24
+
+  router:
+    type: OS::Neutron::Router
+    properties:
+      external_gateway_info:
+        network: { get_param: public_network }
+
+  router-interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: router }
+      subnet: { get_resource: private_subnet }
+
+  oshift_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: private_network }
+      security_groups:
+        - { get_resource: oshift_server_security_group }
+
+  oshift_instance:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: oshift_hostname }
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key }
+      networks:
+        - port: { get_resource: oshift_port }
+      user_data_format: RAW
+      user_data: { get_resource: oshift_boot_config }
+
+  floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: public_network }
+
+  floating_ip_assoc:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: floating_ip }
+      port_id: { get_resource: oshift_port }
+
+outputs:
+  instance_name:
+    description: Name of the instance
+    value: { get_attr: [oshift_instance, name] }
+  instance_ip:
+    description: The IP address of the deployed instance
+    value: { get_attr: [floating_ip, floating_ip_address] }
