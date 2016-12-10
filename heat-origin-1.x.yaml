@@ -192,27 +192,31 @@ resources:
   oshift_server_security_group:
     type: OS::Neutron::SecurityGroup
     properties:
-      name: oshift_server_security_group
+      description: allow 22 through 59999
+      name: rmeggins.secgroup-junk
       rules:
         - protocol: icmp
         - protocol: tcp
           port_range_min: 22
-          port_range_max: 22
-        - protocol: tcp
-          port_range_min: 5901
-          port_range_max: 5901
-        - protocol: tcp
-          port_range_min: 80
-          port_range_max: 80
-        - protocol: tcp
-          port_range_min: 443
-          port_range_max: 443
-        - protocol: tcp
-          port_range_min: 8443
-          port_range_max: 8443
-        - protocol: tcp
-          port_range_min: 5601
-          port_range_max: 5601
+          port_range_max: 59999
+        # - protocol: tcp
+        #   port_range_min: 5901
+        #   port_range_max: 5901
+        # - protocol: tcp
+        #   port_range_min: 80
+        #   port_range_max: 80
+        # - protocol: tcp
+        #   port_range_min: 443
+        #   port_range_max: 443
+        # - protocol: tcp
+        #   port_range_min: 8443
+        #   port_range_max: 8443
+        # - protocol: tcp
+        #   port_range_min: 5601
+        #   port_range_max: 5601
+        # - protocol: tcp
+        #   port_range_min: 24284
+        #   port_range_max: 24284
 
   private_network:
     type: OS::Neutron::Net
