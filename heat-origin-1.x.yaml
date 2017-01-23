@@ -192,15 +192,13 @@ resources:
   oshift_server_security_group:
     type: OS::Neutron::SecurityGroup
     properties:
-      name: oshift_server_security_group
+      description: OpenShift + secure_forward listener
+      name: rmeggins.secgroup-oshift-mux
       rules:
         - protocol: icmp
         - protocol: tcp
           port_range_min: 22
           port_range_max: 22
-        - protocol: tcp
-          port_range_min: 5901
-          port_range_max: 5901
         - protocol: tcp
           port_range_min: 80
           port_range_max: 80
@@ -211,8 +209,8 @@ resources:
           port_range_min: 8443
           port_range_max: 8443
         - protocol: tcp
-          port_range_min: 5601
-          port_range_max: 5601
+          port_range_min: 24284
+          port_range_max: 24284
 
   private_network:
     type: OS::Neutron::Net
